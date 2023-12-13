@@ -65,6 +65,9 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="lcd.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="PID.c">
       <SubType>compile</SubType>
     </Compile>
