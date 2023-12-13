@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "PID", "PID\PID.cproj", "{FB0F0DE1-57B0-4223-90C9-06A7B6787073}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FB0F0DE1-57B0-4223-90C9-06A7B6787073}.Debug|AVR.ActiveCfg = Debug|AVR
+		{FB0F0DE1-57B0-4223-90C9-06A7B6787073}.Debug|AVR.Build.0 = Debug|AVR
+		{FB0F0DE1-57B0-4223-90C9-06A7B6787073}.Release|AVR.ActiveCfg = Release|AVR
+		{FB0F0DE1-57B0-4223-90C9-06A7B6787073}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
