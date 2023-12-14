@@ -1312,14 +1312,14 @@ int main(void)
 		else
 		{
 			forward();
-			velocity(150-PID, 150+PID);
+			velocity(100-PID, 100+PID);
  6cc:	0f 2e       	mov	r0, r31
  6ce:	f2 e1       	ldi	r31, 0x12	; 18
  6d0:	6f 2e       	mov	r6, r31
  6d2:	f2 e0       	ldi	r31, 0x02	; 2
  6d4:	7f 2e       	mov	r7, r31
  6d6:	f0 2d       	mov	r31, r0
- 6d8:	06 e9       	ldi	r16, 0x96	; 150
+ 6d8:	04 e6       	ldi	r16, 0x64	; 100
 	init_devices();
 	lcd_set_4bit();
 	lcd_init();
@@ -1464,12 +1464,12 @@ int main(void)
 		{
 			forward();
  820:	0e 94 80 02 	call	0x500	; 0x500 <forward>
-			velocity(150+PID, 150-PID);
+			velocity(100+PID, 100-PID);
  824:	f3 01       	movw	r30, r6
  826:	80 81       	ld	r24, Z
  828:	60 2f       	mov	r22, r16
  82a:	68 1b       	sub	r22, r24
- 82c:	8a 56       	subi	r24, 0x6A	; 106
+ 82c:	8c 59       	subi	r24, 0x9C	; 156
  82e:	0e 94 61 02 	call	0x4c2	; 0x4c2 <velocity>
  832:	87 ea       	ldi	r24, 0xA7	; 167
  834:	91 e6       	ldi	r25, 0x61	; 97
@@ -1484,11 +1484,11 @@ int main(void)
 		{
 			forward();
  840:	0e 94 80 02 	call	0x500	; 0x500 <forward>
-			velocity(150-PID, 150+PID);
+			velocity(100-PID, 100+PID);
  844:	f3 01       	movw	r30, r6
  846:	80 81       	ld	r24, Z
  848:	68 2f       	mov	r22, r24
- 84a:	6a 56       	subi	r22, 0x6A	; 106
+ 84a:	6c 59       	subi	r22, 0x9C	; 156
  84c:	f0 2f       	mov	r31, r16
  84e:	f8 1b       	sub	r31, r24
  850:	8f 2f       	mov	r24, r31

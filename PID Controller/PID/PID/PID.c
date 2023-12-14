@@ -300,9 +300,9 @@ void init_devices()
 
 int Setpoint=0;
 int error=0;
-float kp=1;
+float kp=2.5;
 float ki=0.1;
-float kd=0.5;
+float kd=0.9;
 int Processedvar =0;
 int PID=0;
 int integral=0;
@@ -348,13 +348,13 @@ int main(void)
 		if(Left_white_line < 0x28)
 		{
 			forward();
-			velocity(150+PID, 150-PID);
+			velocity(100+PID, 100-PID);
 			_delay_ms(100);
 		}
 		else
 		{
 			forward();
-			velocity(150-PID, 150+PID);
+			velocity(100-PID, 100+PID);
 			_delay_ms(100);
 		}
 	}
