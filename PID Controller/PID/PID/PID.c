@@ -347,13 +347,13 @@ int main(void)
 		if(Left_white_line < 0x28)
 		{
 			forward();
-			velocity(200+PID, 200-PID);
+			velocity(150+PID, 150-PID);
 			_delay_ms(100);
 		}
 		else
 		{
 			forward();
-			velocity(200-PID, 200+PID);
+			velocity(150-PID, 150+PID);
 			_delay_ms(100);
 		}
 	}
