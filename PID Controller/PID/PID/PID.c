@@ -10,7 +10,7 @@
 #define F_CPU 14745600UL
 
 #include <math.h> //included to support power function
-#include "IncFile1.h"
+#include "lcd.h"
 
 void port_init();
 void timer5_init();
@@ -231,7 +231,7 @@ void back_white_line (data)
 		print_sensor(1,5,2);	//Prints Value of White Line Sensor2
 		print_sensor(1,9,1);	//Prints Value of White Line Sensor3
 
-		if(Center_white_line<0x28)
+		if(Center_white_line<0x28)	//40
 		{
 			flag=1;
 			back();
@@ -299,16 +299,15 @@ void init_devices()
 
 int Setpoint=0;
 int error=0;
-unsigned int kp=0;
-unsigned int ki=0;
+float kp=1;
+float ki=0.1;
+float kd=0.5;
 int Processedvar =0;
 int PID=0;
 int integral=0;
 int derivative=0;
-unsigned int kd=;
 int lasterror=0;
 
-int convInt(unsigned char val);
 
 //Main Function
 int main(void)
@@ -328,23 +327,34 @@ int main(void)
 		print_sensor(1,5,2);	//Prints Value of White Line Sensor2
 		print_sensor(1,9,1);	//Prints Value of White Line Sensor3
 		
-		if(flag == 0)
-		{
-			Setpoint = convInt(Center_white_line);
-			flag=1;
-		}
+		Setpoint = 0x28;
 		
-		Processedvar = convInt(Center_white_line);
-		error = Processedvar - Setpoint;
+		if (Left_white_line < 0x28)
+		{
+			Processedvar = Left_white_line;
+		}
+		else
+		{
+			Processedvar = Right_white_line;
+		}
+		error = Setpoint - Processedvar;
 		integral += error;
-		derivative = lasterror-error;
+		derivative = -lasterror+error;
 		lasterror = error;
 		
 		PID = kp * error + ki * integral + kd * derivative;
 		
-		forward();
-		velocity(255-PID, 255-PID);
-		_delay_ms(100);
-		
+		if(Left_white_line < 0x28)
+		{
+			forward();
+			velocity(200+PID, 200-PID);
+			_delay_ms(100);
+		}
+		else
+		{
+			forward();
+			velocity(200-PID, 200+PID);
+			_delay_ms(100);
+		}
 	}
 }
