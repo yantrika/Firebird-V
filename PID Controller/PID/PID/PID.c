@@ -298,16 +298,16 @@ void init_devices()
 	sei();   //Enables the global interrupts
 }
 
-int Setpoint=0;
-int error=0;
-float kp=2.5;
-float ki=0.1;
-float kd=0.9;
-int Processedvar =0;
-int PID=0;
-int integral=0;
-int derivative=0;
-int lasterror=0;
+float Setpoint=0;
+float error=0;
+float kp=4;
+float ki=0.13;
+float kd=0.6;
+float Processedvar =0;
+float PID=0;
+float integral=0;
+float derivative=0;
+float lasterror=0;
 
 
 //Main Function
@@ -343,18 +343,19 @@ int main(void)
 		derivative = -lasterror+error;
 		lasterror = error;
 		
+		
 		PID = kp * error + ki * integral + kd * derivative;
 		
 		if(Left_white_line < 0x28)
 		{
 			forward();
-			velocity(100+PID, 100-PID);
+			velocity(200+PID, 200-PID);
 			_delay_ms(100);
 		}
 		else
 		{
 			forward();
-			velocity(100-PID, 100+PID);
+			velocity(200-PID, 200+PID);
 			_delay_ms(100);
 		}
 	}
