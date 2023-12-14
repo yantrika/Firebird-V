@@ -293,6 +293,7 @@ void init_devices()
 	port_init();  //Initializes all the ports
 	// uart0_init(); //Initailize UART1 for serial communiaction
 	adc_init();
+	lcd_init();
 	timer5_init();
 	sei();   //Enables the global interrupts
 }
