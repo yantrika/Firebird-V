@@ -24,6 +24,17 @@ unsigned char flag = 0;
 unsigned char Left_white_line = 0;
 unsigned char Center_white_line = 0;
 unsigned char Right_white_line = 0;
+float Setpoint=0;
+float error=0;
+float kp=4;
+float ki=0.13;
+float kd=0.6;
+float Processedvar =0;
+float PID=0;
+float integral=0;
+float derivative=0;
+float lasterror=0;
+
 
 void lcd_port_config (void)
 {
@@ -195,25 +206,7 @@ void uart0_init(void)
 	UBRR0H = 0x00; //set baud rate hi
 	UCSR0B = 0x98;
 }
-
-void pid_control (data)
-{
-		while(data != 0x20)
-		{
-			data = UDR0;	//Echo back to zigbee
-			UDR0 = data;
-			
-			Left_white_line = ADC_Conversion(3);	//Getting data of Left WL Sensor
-			Center_white_line = ADC_Conversion(2);	//Getting data of Center WL Sensor
-			Right_white_line = ADC_Conversion(1);	//Getting data of Right WL Sensor
-
-			flag=0;
-
-			print_sensor(1,1,3);	//Prints value of White Line Sensor1
-			print_sensor(1,5,2);	//Prints Value of White Line Sensor2
-			print_sensor(1,9,1);	//Prints Value of White Line Sensor3
-		}
-}
+/*
 
 void back_white_line (data)
 {
@@ -260,30 +253,46 @@ void back_white_line (data)
 	}	
 }
 
+*/
 
-/*
 SIGNAL(SIG_USART0_RECV) 		// ISR for receive complete interrupt
 {
 	data = UDR0; 				//making copy of data from UDR0 in 'data' variable
 
-	UDR0 = data; 				//echo data back to PC
-	if(data == 0x77) //ASCII value of w
+	UDR0 = data; 	
+	UDR0 = Center_white_line;			//echo data back to PC
+	
+	if(data == 0x51)	//unicode value of q
 	{
-		pid_control(data);
-	}
-
-	if(data == 0x73) //ASCII value of s
-	{
-		back_white_line(data);
+		kp += 0.5;
 	}
 	
-	if(data == 0x20) //ASCII value of spacebar
+	if(data == 0x77) //Unicode value of w
 	{
-		stop();
+		kp-=0.5;
+	}
+	
+	if(data == 0x77) //Unicode value of a
+	{
+		kd+=0.05;
+	}
+
+	if(data == 0x73) //Unicode value of s
+	{
+		kd -= 0.05;
+	}
+	
+	if(data == 0x65) //Unicode value of e
+	{
+		ki += 0.01;
+	}
+	
+	if(data == 0x72)	//Unicode value of r
+	{
+		ki -= 0.01;
 	}
 	
 }
-*/
 
 
 //Function To Initialize all The Devices
@@ -291,24 +300,12 @@ void init_devices()
 {
 	cli(); //Clears the global interrupts
 	port_init();  //Initializes all the ports
-	// uart0_init(); //Initailize UART1 for serial communiaction
+	uart0_init(); //Initailize UART1 for serial communiaction
 	adc_init();
 	lcd_init();
 	timer5_init();
 	sei();   //Enables the global interrupts
 }
-
-float Setpoint=0;
-float error=0;
-float kp=4;
-float ki=0.13;
-float kd=0.6;
-float Processedvar =0;
-float PID=0;
-float integral=0;
-float derivative=0;
-float lasterror=0;
-
 
 //Main Function
 int main(void)
@@ -318,6 +315,8 @@ int main(void)
 	lcd_init();
 	while(1)
 	{
+		uart0_init();
+		
 		Left_white_line = ADC_Conversion(3);	//Getting data of Left WL Sensor
 		Center_white_line = ADC_Conversion(2);	//Getting data of Center WL Sensor
 		Right_white_line = ADC_Conversion(1);	//Getting data of Right WL Sensor
@@ -330,14 +329,13 @@ int main(void)
 		
 		Setpoint = 0x28;
 		
-		if (Left_white_line < 0x28)
+		if(Center_white_line < 0x28)
 		{
-			Processedvar = Left_white_line;
+			Center_white_line = -Center_white_line;
 		}
-		else
-		{
-			Processedvar = Right_white_line;
-		}
+		
+		Processedvar = Center_white_line -Left_white_line + Right_white_line;
+		
 		error = Setpoint - Processedvar;
 		integral += error;
 		derivative = -lasterror+error;
@@ -346,17 +344,8 @@ int main(void)
 		
 		PID = kp * error + ki * integral + kd * derivative;
 		
-		if(Left_white_line < 0x28)
-		{
-			forward();
-			velocity(200+PID, 200-PID);
-			_delay_ms(100);
-		}
-		else
-		{
-			forward();
-			velocity(200-PID, 200+PID);
-			_delay_ms(100);
-		}
+		forward();
+		velocity(200+PID, 200-PID);
+		_delay_ms(100);
 	}
 }
