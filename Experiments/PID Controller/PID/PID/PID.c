@@ -27,13 +27,15 @@ unsigned char Right_white_line = 0;
 float Setpoint=0;
 float error=0;
 float kp=4;
-float ki=0.13;
+float ki=0.26;
 float kd=0.6;
 float Processedvar =0;
 float PID=0;
 float integral=0;
 float derivative=0;
 float lasterror=0;
+int kc = 4;
+unsigned char max = 0xFF;
 
 
 void lcd_port_config (void)
@@ -116,7 +118,7 @@ void velocity (unsigned char left_motor, unsigned char right_motor)
 
 // ***************************************************************************************************
 
-unsigned char data; //to store received data from UDR1
+float data; //to store received data from UDR1
 void buzzer_pin_config (void)
 {
 	DDRC = DDRC | 0x08;		//Setting PORTC 3 as outpt
@@ -259,37 +261,47 @@ SIGNAL(SIG_USART0_RECV) 		// ISR for receive complete interrupt
 {
 	data = UDR0; 				//making copy of data from UDR0 in 'data' variable
 
-	UDR0 = data; 	
-	UDR0 = Center_white_line;			//echo data back to PC
+	UDR0 = data; 				//echo data back to PC
 	
-	if(data == 0x51)	//unicode value of q
+	if(data == 0x31)	//Unicode value of q
 	{
 		kp += 0.5;
+		UDR0 = kp;
 	}
 	
-	if(data == 0x77) //Unicode value of w
+	if(data == 0x32) //Unicode value of w
 	{
 		kp-=0.5;
+		UDR0 = kp;
 	}
 	
-	if(data == 0x77) //Unicode value of a
+	if(data == 0x33) //Unicode value of a
 	{
 		kd+=0.05;
+		UDR0 = kd;
 	}
 
-	if(data == 0x73) //Unicode value of s
+	if(data == 0x34) //Unicode value of s
 	{
 		kd -= 0.05;
+		UDR0 = kd;
 	}
 	
-	if(data == 0x65) //Unicode value of e
+	if(data == 0x35) //Unicode value of e
 	{
 		ki += 0.01;
+		UDR0 = ki;
 	}
 	
-	if(data == 0x72)	//Unicode value of r
+	if(data == 0x36)	//Unicode value of r
 	{
 		ki -= 0.01;
+		UDR0 = ki;
+	}
+	
+	if(data == 0x37)
+	{
+		kc += 1;
 	}
 	
 }
@@ -315,11 +327,11 @@ int main(void)
 	lcd_init();
 	while(1)
 	{
-		uart0_init();
 		
-		Left_white_line = ADC_Conversion(3);	//Getting data of Left WL Sensor
-		Center_white_line = ADC_Conversion(2);	//Getting data of Center WL Sensor
-		Right_white_line = ADC_Conversion(1);	//Getting data of Right WL Sensor
+		
+		Left_white_line = max - ADC_Conversion(3);	//Getting data of Left WL Sensor
+		Center_white_line = max - ADC_Conversion(2);	//Getting data of Center WL Sensor
+		Right_white_line = max - ADC_Conversion(1);	//Getting data of Right WL Sensor
 
 		flag=0;
 
@@ -329,14 +341,17 @@ int main(void)
 		
 		Setpoint = 0x28;
 		
-		if(Center_white_line < 0x28)
+		
+		Processedvar = kc *Center_white_line -Left_white_line + Right_white_line;
+		
+		if (Processedvar < 0)
 		{
-			Center_white_line = -Center_white_line;
+			error = Setpoint - Processedvar;
 		}
-		
-		Processedvar = Center_white_line -Left_white_line + Right_white_line;
-		
-		error = Setpoint - Processedvar;
+		else
+		{
+			error = Processedvar - Setpoint;
+		}			
 		integral += error;
 		derivative = -lasterror+error;
 		lasterror = error;
@@ -344,8 +359,17 @@ int main(void)
 		
 		PID = kp * error + ki * integral + kd * derivative;
 		
+		if(Left_white_line < 0x28){
 		forward();
 		velocity(200+PID, 200-PID);
-		_delay_ms(100);
+		_delay_ms(10);
+		}
+		else
+		
+		{
+			forward();
+			velocity(200-PID, 200+PID);
+			_delay_ms(10);
+		}		
 	}
 }
