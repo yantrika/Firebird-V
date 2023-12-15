@@ -26,7 +26,7 @@ unsigned char Center_white_line = 0;
 unsigned char Right_white_line = 0;
 float Setpoint=0;
 float error=0;
-float kp=4;
+float kp=4.5;
 float ki=0.26;
 float kd=0.6;
 float Processedvar =0;
@@ -34,7 +34,7 @@ float PID=0;
 float integral=0;
 float derivative=0;
 float lasterror=0;
-int kc = 4;
+int kc = 9;
 unsigned char max = 0xFF;
 
 
